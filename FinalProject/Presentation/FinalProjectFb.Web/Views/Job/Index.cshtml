@@ -1,0 +1,61 @@
+﻿@using FinalProjectFb.Application.ViewModels
+@using FinalProjectFb.Domain.Entities
+@using FinalProjectFb.ViewModels
+@model PaginateVM<Job>
+@{
+	int count = 0;
+}
+
+
+<div class="section-top-border">
+	<style>
+		.section-top-border {
+			display: flex;
+			justify-content: center;
+		}
+	</style>
+
+	<div class="progress-table-wrap">
+		<h3 style="color:darkblue">Jobs</h3>
+		<br />
+		
+		<a asp-action="create" asp-controller="job" asp-route-CompanyId="@Model.CompanyId" class="genric-btn primary-border circle">Create</a>
+		<br />
+		<br />
+		<div class="progress-table">
+			<div class="table-head">
+				<div class="serial">No</div>
+				<div class="country">Name</div>
+				<div class="visit">Vacancy</div>
+				<div class="status">Settings</div>
+
+
+			</div>
+			@foreach (var item in Model.Items.Where(j => j.Company.Id == j.CompanyId && j.Company.Id == Model.CompanyId))
+			{
+				count++;
+				<div class="table-row">
+					<div class="serial">@count</div>
+					<a asp-action="detail" asp-controller="job" asp-route-id="@item.Id" class="country" style="text-decoration: none; color: inherit; cursor: pointer;">@item.Name<span>(@item.Cvs.Count)</span></a>
+
+					<div class="visit"><a style="color:black" asp-action="index" asp-controller="Cv" asp-route-id="@item.Id">Cv</a></div>
+
+
+					<div class="country">
+						<a asp-action="update" asp-controller="job" asp-route-id="@item.Id" class="genric-btn primary-border circle">Update</a>
+						<a asp-action="delete" asp-controller="job" asp-route-id="@item.Id" class="genric-btn primary-border circle">Delete</a>
+
+					</div>
+
+
+
+
+				</div>
+			}
+
+		</div>
+
+
+	</div>
+	
+</div>
