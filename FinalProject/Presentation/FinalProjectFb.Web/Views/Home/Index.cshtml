@@ -21,17 +21,24 @@
                     <!-- Search Box -->
                     <div class="row">
                         <div class="col-xl-8">
+                          
                             <!-- form -->
-                            <form asp-action="index" asp-controller="home" class="search-box">
+                            <form method="get" asp-action="search" asp-controller="Home" class="search-box">
                                 <div class="input-form">
                                     <input 
-                                        name="search"
+                                        name="job"
                                         type="text"
-                                        placeholder="Job Tittle or keyword">
+                                           placeholder='@(TempData["ErrorMessage"] is null ? "Type here to search..." : TempData["ErrorMessage"].ToString())'>
                                 </div>
                                 <div class="search-form">
-                                    <button type="submit" >Find job</button>
+                                    <button style="background-color:#fb246a" type="submit">Find job</button>
                                 </div>
+                                <style>
+                                    .search-form button {
+                                        width: 100%;
+                                        height: 100%;
+                                    }
+                                </style>
                             </form>
                         </div>
                     </div>
@@ -64,7 +71,7 @@
                                     <span class="@item.Icon"></span>
                                 </div>
                                 <div class="services-cap">
-                                    <h5><a href="job_listing.html">@item.Name</a></h5>
+                                    <h5><a asp-action="categoryjobs" asp-controller="job" asp-route-Id="@item.Id">@item.Name</a></h5>
                                     <span>@item.Jobs.Count</span>
                                 </div>
                             </div>

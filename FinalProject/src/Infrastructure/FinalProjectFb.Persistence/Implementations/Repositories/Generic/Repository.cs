@@ -111,6 +111,15 @@ namespace FinalProjectFb.Persistence.Implementations.Repositories.Generic
             
             return await query.FirstOrDefaultAsync();
         }
+        public async Task<T> GetByIdAsyncc( bool isTracking = false, bool? isDeleted = null, bool ignoreQuery = false, params string[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+            if (ignoreQuery) query = query.IgnoreQueryFilters();
+            if (!isTracking) query = query.AsNoTracking();
+            query = _addIncludes(query, includes);
+
+            return await query.FirstOrDefaultAsync();
+        }
         public async Task<T> GetByIdnotDeletedAsync(int id, bool isTracking = false, params string[] includes)
         {
             IQueryable<T> query = _dbSet.Where(x => x.Id == id);

@@ -19,7 +19,10 @@ namespace FinalProjectFb.Application.Abstractions.Services
         Task<bool> UpdateAsync(UpdateJobVM JobVm, ModelStateDictionary modelState, int id);
 		Task<UpdateJobVM> UpdatedAsync(int id);
 		Task DeleteAsync(int id);
-		Task ReverseDeleteAsync(int id);
+        Task<PaginateVM<Job>> GetCategoryId(int id, int page = 1, int take = 10);
+        Task<Job> GetJob(string job);
+        Task<List<Job>> GetJobs(string job);
+        Task ReverseDeleteAsync(int id);
 		Task Submit(int id);
 		Task SoftDeleteAsync(int id);
 		Task<JobDetailVM> DetailAsync(int id);

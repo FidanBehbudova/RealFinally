@@ -12,6 +12,7 @@ using FinalProjectFb.Persistence.Implementations.Repositories.Generic;
 using FinalProjectFb.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -35,8 +36,9 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 		private readonly IWebHostEnvironment _env;
 		private readonly ICompanyRepository _company;
 		private readonly ICategoryRepository _category;
+        private readonly AppDbContext _context;
 
-		public JobService(IJobRepository repository, IHttpContextAccessor accessor, IUserService user, IWebHostEnvironment env, ICompanyRepository company, ICategoryRepository category)
+        public JobService(IJobRepository repository, IHttpContextAccessor accessor, IUserService user, IWebHostEnvironment env, ICompanyRepository company, ICategoryRepository category,AppDbContext context)
 		{
 			_repository = repository;
 			_accessor = accessor;
@@ -44,7 +46,8 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 			_env = env;
 			_company = company;
 			_category = category;
-		}
+            _context = context;
+        }
 		public async Task<AllJobVM> AllJobAsync()
 		{
 			AllJobVM vm = new AllJobVM
@@ -124,6 +127,24 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 			await _repository.SaveChangesAsync();
 			return true;
 		}
+
+		public async Task<PaginateVM<Job>> GetCategoryId(int id, int page = 1, int take = 10)
+		{
+            if (page < 1 || take < 1) throw new Exception("Bad request");
+			//ICollection<Job> jobs = await _repository.GetAllWhere(c => c.Category).ToListAsync();
+		ICollection<Job>jobs = await _repository.GetPagination(skip: (page - 1) * take, take: take,orderExpression: x => x.Id,expression:c=>c.CategoryId==id, IsDescending: true,includes:new string[] {"Images","Category","Company.CompanyCities", "Company.CompanyCities.City" }).ToListAsync();
+            if (jobs == null) throw new Exception("Not Found");
+            int count = await _repository.GetAll().CountAsync();
+            if (count < 0) throw new Exception("Not Found");
+            double totalpage = Math.Ceiling((double)count / take);
+            PaginateVM<Job> vm = new PaginateVM<Job>
+            {
+                Items = jobs,
+                CurrentPage = page,
+                TotalPage = totalpage
+            };
+			return vm;
+        }
 		public async Task<PaginateVM<Job>> GetAllAsync(int id, int page = 1, int take = 5)
 		{
 			if (page < 1 || take < 1) throw new Exception("Bad request");
@@ -144,8 +165,18 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 			};
 			return vm;
 		}
+        public async Task<Job> GetJob(string job)
+        {
+           return  await _repository.GetByIdAsyncc(includes: new string[] { "Company", "Company.CompanyCities", "Company.CompanyCities.City", "Category", "Images" });
+		
+        }
+        public async Task<List<Job>> GetJobs(string job)
+        {
 
-		public async Task<CreateJobVM> CreatedAsync(CreateJobVM vm)
+            return await _context.Jobs.Where(x => x.Name.ToLower().Contains(job.ToLower()) || x.Category.Name.ToLower().Contains(job.ToLower()) || x.JobNature.ToLower().Contains(job.ToLower())).Include(j=>j.Images).Include(j=>j.Category).Include(j=>j.Company).ThenInclude(c=>c.CompanyCities).ThenInclude(cc=>cc.City).ToListAsync();
+        }
+
+        public async Task<CreateJobVM> CreatedAsync(CreateJobVM vm)
 		{
 
 			vm.Categories = await _category.GetAll().ToListAsync();
@@ -200,82 +231,7 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 			return detailVM;
 		}
 
-		//public async Task<bool> UpdateAsync(UpdateJobVM JobVm, ModelStateDictionary modelState, int id)
-		//{
-		//	if (!modelState.IsValid) return false;
-		//	Job job = await _repository.GetByIdAsync(id, isDeleted: false);
-		//	if (job == null) throw new Exception("Not found");
-		//	if (await _company.IsExist(x => x.Id == JobVm.CompanyId) == false)
-		//	{
-		//		modelState.AddModelError("CompanyId", "You dont have this Company");
-		//		return false;
-		//	}
-		//	if (JobVm.CategoryId is not null)
-		//	{
-		//		if (!await _company.IsExist(x => x.Id == JobVm.CategoryId))
-		//		{
-		//			modelState.AddModelError("CategoryId", "You dont have this Category");
-		//			return false;
-		//		}
-
-		//	}
-		//	if (JobVm.Name != job.Name)
-		//	{
-		//		ICollection<Job> Jobs = await _repository.GetAllnotDeleted().ToListAsync();
-
-		//		if (Jobs.Where(x => x.Name == JobVm.Name && x.CompanyId == JobVm.CompanyId).Count() >= 1)
-		//		{
-		//			modelState.AddModelError("Name", "You have this Job in your Jobs");
-		//			return false;
-		//		}
-
-		//	}
-		//	job.Name = JobVm.Name;
-		//	job.JobNature = JobVm.JobNature;
-		//	job.Experience = JobVm.Experience;
-		//	job.Vacancy = JobVm.Vacancy;
-		//	job.Requirement = JobVm.Requirement;
-		//	job.ModifiedAt = DateTime.UtcNow;
-		//	job.Deadline = (DateTime)JobVm.Deadline;
-		//	job.Salary = (decimal)JobVm.Salary;
-		//	job.CategoryId = JobVm.CategoryId;
-
-
-		//	if (JobVm.Photo != null)
-		//	{
-		//		if (!JobVm.Photo.ValidateType("image/"))
-		//		{
-		//			modelState.AddModelError("Photo", "Your photo type is not true.Please use only image");
-		//			return false;
-		//		}
-		//		if (!JobVm.Photo.ValidateSize(5 * 1024))
-		//		{
-		//			modelState.AddModelError("Photo", "Your photo size max be 5mb");
-		//			return false;
-		//		}
-
-
-		//		if (JobVm.Photo != null)
-		//		{
-		//			string fileName = await JobVm.Photo.CreateFileAsync(_env.WebRootPath, "assets", "img", "icon");
-		//			Image main = job.Images.FirstOrDefault(pi => pi.IsPrimary == true);
-		//			main.Url.DeleteFile(_env.WebRootPath, "assets", "images", "icon");
-		//			job.Images.Remove(main);
-
-		//			job.Images.Add(new Image
-		//			{
-		//				IsPrimary = true,
-		//				Url = fileName
-		//			});
-		//		}
-
-
-
-		//	}
-		//	_repository.Update(job);
-		//	await _repository.SaveChangesAsync();
-		//	return true;
-		//}
+		
 
 		public async Task<bool> UpdateAsync(UpdateJobVM UpdateJobVM, ModelStateDictionary modelState, int id)
 		{

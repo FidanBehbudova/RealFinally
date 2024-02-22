@@ -5,6 +5,7 @@ using FinalProjectFb.Application.ViewModels;
 using FinalProjectFb.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -113,7 +114,19 @@ namespace FinalProjectFb.Persistence.Implementations.Services
             return true;
         }
 
-        
+        public async Task<PaginateVM<Category>> Detail(int id, int page = 1, int take = 10)
+        {
+            ICollection<Category> categories = await _repository.GetPagination(skip: (page - 1) * take, take: take,includes:new string[] {"Jobs"}).ToListAsync();
+            int count = await _repository.GetAll().CountAsync();
+            double totalpage = Math.Ceiling((double)count / take);
+            PaginateVM<Category> vm = new PaginateVM<Category>
+            {
+                Items = categories,
+                CurrentPage = page,
+                TotalPage = totalpage
+            };
+            return vm;
+        }
 
 
     }

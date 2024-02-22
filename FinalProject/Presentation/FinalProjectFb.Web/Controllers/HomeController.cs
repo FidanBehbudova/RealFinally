@@ -14,11 +14,13 @@ namespace FinalProjectFb.Web.Controllers
     {
         private readonly IHomeService _service;
         private readonly AppDbContext _context;
+        private readonly IJobService _job;
 
-        public HomeController(IHomeService service,AppDbContext context)
+        public HomeController(IHomeService service,AppDbContext context,IJobService job)
         {
             _service = service;
             _context = context;
+            _job = job;
         }
 
         public async Task<IActionResult> Index(string search)
@@ -41,6 +43,18 @@ namespace FinalProjectFb.Web.Controllers
                 return View("Error", new WrongRequestException(""));
             }
         }
+
+        public async Task<IActionResult> Search(string job)
+        {
+            if (string.IsNullOrWhiteSpace(job) || job.Length < 3)
+            {
+                TempData["ErrorMessage"] = "Search term must be at least 3 characters long.";
+                return RedirectToAction(nameof(Index));
+            }
+            List<Job> jobs = await _job.GetJobs(job);
+            return View(jobs);
+        }
+
 
 
     }

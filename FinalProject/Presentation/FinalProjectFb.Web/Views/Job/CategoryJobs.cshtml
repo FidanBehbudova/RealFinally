@@ -1,0 +1,105 @@
+﻿@using FinalProjectFb.Application.ViewModels
+@using FinalProjectFb.Domain.Entities
+@model PaginateVM<Job>
+
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <!-- single-job-content -->
+       
+         
+        @foreach (var item in Model.Items)
+        {
+            <div class="single-job-items mb-30">
+
+                <div class="job-items">
+                    <div class="company-img">
+                        <a asp-action="detail" asp-controller="job" asp-route-id="@item.Id"><img style="height:80px;width:80px" src="~/assets/img/icon/@item.Images.FirstOrDefault()?.Url" alt=""></a>
+                    </div>
+                    <div class="job-tittle">
+                        <a asp-action="detail" asp-controller="job" asp-route-id="@item.Id"><h4>@item.Name</h4></a>
+                        <ul>
+                            <li>@item.Category.Name</li>
+                            <li><i class="fas fa-map-marker-alt"></i>@item.Company.CompanyCities.FirstOrDefault(c => c.City.Id == c.CityId)?.City.Name</li>
+                            <li>$@item.Salary</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="items-link f-right">
+                    <a asp-action="detail" asp-controller="job" asp-route-id="@item.Id">@item.JobNature</a>
+                    <span>
+                        @{
+                            TimeSpan difference = DateTime.Now - item.CreatedAt;
+
+                            string timedifference = "";
+                            if (difference.TotalDays >= 1)
+                            {
+                                timedifference = $"{(int)difference.TotalDays} days ago";
+                            }
+                            else if (difference.TotalHours >= 1)
+                            {
+                                timedifference = $"{(int)difference.TotalHours} hours ago";
+                            }
+                            else
+                            {
+                                timedifference = $"{(int)difference.TotalMinutes} minutes ago";
+                            }
+                        }
+
+                        @timedifference
+                    </span>
+                </div>
+            </div>
+        }
+
+        @* @foreach (var item in Model.Jobs)
+        {
+        <div class="single-job-items mb-30">
+        <div class="job-items">
+        <div class="company-img">
+        <a asp-action="detail" asp-controller="job" asp-route-id="@item.Id"><img style="height:80px;width:80px" src="~/assets/img/icon/@item.Images.FirstOrDefault()?.Url" alt=""></a>
+        </div>
+        <div class="job-tittle">
+        <a asp-action="detail" asp-controller="job" asp-route-id="@item.Id"><h4>@item.Name</h4></a>
+        <ul>
+        <li>@item.Category.Name</li>
+        <li><i class="fas fa-map-marker-alt"></i>@item.Company.CompanyCities.FirstOrDefault(c=>c.City.Id==c.CityId)?.City.Name</li>
+        <li>$@item.Salary</li>
+        </ul>
+        </div>
+        </div>
+        <div class="items-link f-right">
+        <a asp-action="detail" asp-controller="job" asp-route-id="@item.Id">@item.JobNature</a>
+        <span>
+        @{
+        TimeSpan difference = DateTime.Now - item.CreatedAt;
+
+        string timedifference = "";
+        if (difference.TotalDays >= 1)
+        {
+        timedifference = $"{(int)difference.TotalDays} days ago";
+        }
+        else if (difference.TotalHours >= 1)
+        {
+        timedifference = $"{(int)difference.TotalHours} hours ago";
+        }
+        else
+        {
+        timedifference = $"{(int)difference.TotalMinutes} minutes ago";
+        }
+        }
+
+        @timedifference
+
+        </span>
+        </div>
+        </div>
+        } *@
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="browse-btn2 text-center mt-50">
+                    <a asp-action="alljob" asp-controller="job" class="border-btn2">All Jobs</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

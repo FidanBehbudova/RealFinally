@@ -19,6 +19,6 @@ namespace FinalProjectFb.Application.Abstractions.Services
         Task<UpdateCategoryVM> UpdatedAsync(int id, UpdateCategoryVM vm);
         Task<bool> DeleteAsync(int id);
         Task<PaginateVM<Category>> GetAllAsync(int page = 1, int take = 10);
-
+        Task<PaginateVM<Category>> Detail(int id, int page = 1, int take = 10);
     }
 }

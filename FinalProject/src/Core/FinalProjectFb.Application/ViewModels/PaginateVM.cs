@@ -14,7 +14,9 @@ namespace FinalProjectFb.Application.ViewModels
         public int CurrentPage { get; set; }
         public int CompanyId { get; set; }
         public int JobId { get; set; }
-       
+        public int CategoryId { get; set; }
+
+
 
 
     }

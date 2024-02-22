@@ -52,7 +52,7 @@ namespace FinalProjectFb.Web.Controllers
 
         public async Task<IActionResult> AllJob(int? order,int rangeValue = 50, int priceFrom = 0, int priceTo = 100)
         {
-            IQueryable<Job> query = _context.Jobs.Include(j => j.Images).AsQueryable();
+            IQueryable<Job> query = _context.Jobs.Include(j => j.Images).Include(j=>j.Category).Include(j=>j.Company).ThenInclude(c=>c.CompanyCities).ThenInclude(cc=>cc.City).AsQueryable();
 
             switch (order)
             {
@@ -78,7 +78,7 @@ namespace FinalProjectFb.Web.Controllers
             {
                 var model = new AllJobVM
                 {
-                    Jobs = allJobResult.Jobs,
+                    Jobs = await query.ToListAsync(),
                     Categories = allJobResult.Categories,
                     Companies = allJobResult.Companies,
                     RangeValue = rangeValue,
@@ -95,7 +95,13 @@ namespace FinalProjectFb.Web.Controllers
         }
 
 
-
+		public async Task<IActionResult> CategoryJobs(int id, int page = 1, int take = 5)
+		{
+			PaginateVM<Job> job = await _service.GetCategoryId(id, page, take);
+            job.CategoryId = id;
+            if (job.Items == null) return NotFound();
+            return View(job);
+        }
         public async Task<IActionResult> Detail(int id)
 		{
 			return View(await _service.DetailAsync(id));
