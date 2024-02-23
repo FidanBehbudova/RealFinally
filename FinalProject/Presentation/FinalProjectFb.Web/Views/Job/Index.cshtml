@@ -31,7 +31,7 @@
 				 
 
 			</div>
-			@foreach (var item in Model.Items.Where(j => j.Company.Id == j.CompanyId && j.Company.Id == Model.CompanyId))
+			@foreach (var item in Model.Items)
 			{
 				count++;
 				<div class="table-row">

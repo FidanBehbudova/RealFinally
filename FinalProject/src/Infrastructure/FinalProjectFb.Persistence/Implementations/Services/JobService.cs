@@ -146,11 +146,13 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 		public async Task<PaginateVM<Job>> GetAllAsync(int id, int page = 1, int take = 5)
 		{
 			if (page < 1 || take < 1) throw new Exception("Bad request");
-			ICollection<Job> jobs = await _repository.GetPagination(
-				skip: (page - 1) * take, take: take, 
-				orderExpression: x => x.Id, IsDescending: true,
-				includes: new string[]{"Cvs", nameof(Company) })  .ToListAsync();
-			ICollection<Company> companies = await _company.GetAllWhere(c => c.Id == id).ToListAsync();
+			//ICollection<Job> jobs = await _repository.GetPagination(
+			//	skip: (page - 1) * take, take: take, 
+			//	orderExpression: x => x.Id, IsDescending: true,expression:c=>c.CompanyId==id,
+			//	includes: new string[]{"Cvs", nameof(Company) }).ToListAsync();
+
+			ICollection<Job> jobs = await _repository.GetAllWhere(c=>c.CompanyId==id,includes:new string[] {"Cvs"}).ToListAsync();
+			//ICollection<Company> companies = await _company.GetAllWhere(c => c.Id == id).ToListAsync();
 			if (jobs == null) throw new Exception("Not Found");
 			int count = await _repository.GetAll().CountAsync();
 			if (count < 0) throw new Exception("Not Found");
@@ -289,20 +291,21 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 			Job existed = await _repository.GetByIdAsync(id, isDeleted: false, includes: new string[] { "Company",  "Category", "Images" });
 			if (existed == null) throw new Exception("Not Found");
 
-			return new UpdateJobVM
+			var upt = new UpdateJobVM
 			{
 				Requirement = existed.Requirement,
-				CategoryId=existed.CategoryId,
-				Salary=existed.Salary,
-				JobNature=existed.JobNature,
-				Vacancy=existed.Vacancy,
-				Experience=existed.Experience,
-				Deadline=existed.Deadline,
-				CompanyId=existed.CompanyId,
+				CategoryId = existed.CategoryId,
+				Salary = existed.Salary,
+				JobNature = existed.JobNature,
+				Vacancy = existed.Vacancy,
+				Experience = existed.Experience,
+				Deadline = existed.Deadline,
+				CompanyId = existed.CompanyId,
 				Name = existed.Name,
-                Categories = await _category.GetAll().ToListAsync(),
-				Images=existed.Images,
-            };
+				Categories = await _category.GetAll().ToListAsync(),
+				Images = existed.Images,
+			};
+			return upt;
 		}
 		public async Task DeleteAsync(int id)
 		{

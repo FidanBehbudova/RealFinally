@@ -36,7 +36,7 @@ namespace FinalProjectFb.Persistence.Implementations.Repositories.Generic
             params string[] includes)
         {
 
-            IQueryable<T> query = _context.Set<T>();
+            IQueryable<T> query = _dbSet.AsQueryable();
             if (expression != null) query = query.Where(expression);
             query = _addIncludes(query, includes);
 
