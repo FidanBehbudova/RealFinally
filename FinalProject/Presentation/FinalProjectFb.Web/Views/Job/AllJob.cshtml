@@ -51,11 +51,7 @@
                             <form id="categoryForm" method="get" action="/job/alljob">
                                 <div class="select-job-items2">
                                     <select asp-items="new SelectList(Model.Categories,nameof(Category.Id),nameof(Category.Name))" name="categoryId" onchange="this.parentElement.parentElement.submit()">
-                                        <option value="">All Category</option>
-                                        @* @foreach (var item in Model.Categories)
-                                        {
-                                            <option value="@item.Id" action="alljob">@item.Name</option>
-                                        } *@
+                                        <option value="">All Category</option>                                        
                                     </select>
                                 </div>
                             </form>
@@ -64,11 +60,7 @@
                                 function submitForm() {
                                     document.getElementById("categoryForm").submit();
                                 }
-                            </script>
-
-
-                  
-                          
+                            </script>                                          
 
                             <!--  Select job items End-->
                             <!-- select-Categories start -->
@@ -81,31 +73,10 @@
                                     .Distinct()
                                     .ToList();
                                 }
-                                @{
-                                   
-                                    var uniqueJobNatures = Model.Jobs
-                                    .Select(j => j.JobNature)
-                                    .Distinct()
-                                    .ToList();
-                                }
-
-                                <div class="select-Categories pt-80 pb-50">
-                                    <div class="small-section-tittle2">
-                                        <h4>Job Type</h4>
-                                    </div>
-
-                                    @foreach (var jobNature in uniqueJobNatures)
-                                    {
-                                        <label class="container">
-                                            @jobNature
-                                            <input type="checkbox">
-                                            <span class="checkmark"></span>
-                                        </label>
-                                    }
-                                </div>                              
+                                                      
                                
                         
-                            <div class="select-Categories pt-80 pb-50">
+             @*                <div class="select-Categories pt-80 pb-50">
                                 <div class="small-section-tittle2">
                                     <h4>Cities</h4>
                                 </div>
@@ -118,133 +89,30 @@
                                         <span class="checkmark"></span>
                                     </label>
                                 }
-                            </div>
+                            </div> *@
+
+                            <form method="get" action="@Url.Action("AllJob", "Job")">
+                                <div class="select-Categories pt-80 pb-50">
+                                    <div class="small-section-tittle2">
+                                        <h4>Cities</h4>
+                                    </div>
+
+                                    @foreach (var cityName in ViewBag.UniqueCityNames)
+                                    {
+                                        <label class="container">
+                                            @cityName
+                                            <input type="checkbox" name="selectedCities" value="@cityName">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    }
+                                </div>
+                                <button class="btn head-btn1" style="background-color:#fb246a" type="submit">Filter</button>
+                            </form>
+
                             <!-- select-Categories End -->
                         </div>
                         <!-- single two -->
-                        <div class="single-listing">
-                            @* <div class="small-section-tittle2">
-                                <h4>Job Location</h4>
-                            </div>
-                            <!-- Select job items start -->
-                            <div class="select-job-items2">
-                                <select name="select">
-                                    <option value="">Anywhere</option>
-                                    <option value="">Category 1</option>
-                                    <option value="">Category 2</option>
-                                    <option value="">Category 3</option>
-                                    <option value="">Category 4</option>
-                                </select>
-                            </div> *@
-                            <!--  Select job items End-->
-                            <!-- select-Categories start -->
-                           @*  <div class="select-Categories pt-80 pb-50">
-                                <div class="small-section-tittle2">
-                                    <h4>Experience</h4>
-                                </div>
-                                <label class="container">
-                                    1-2 Years
-                                    <input type="checkbox">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <label class="container">
-                                    2-3 Years
-                                    <input type="checkbox" checked="checked active">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <label class="container">
-                                    3-6 Years
-                                    <input type="checkbox">
-                                    <span class="checkmark"></span>
-                                </label>
-                                <label class="container">
-                                    6-more..
-                                    <input type="checkbox">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div> *@
-                            <!-- select-Categories End -->
-                        </div>
-                        <!-- single three -->
-                        <div class="single-listing">
-                            <!-- select-Categories start -->
-                            <div class="select-Categories pb-50">
-                                <div class="small-section-tittle2">
-                                    <h4>Posted Within</h4>
-                                </div>
-                                <label class="container">
-                                    Any
-                                    <input type="checkbox">
-                                    <span class="checkmark"></span>
-                                </label>
-                                @{
-                                    var uniqueTimeAgoValues = Model.Jobs
-                                    .Select(item => GetTimeAgo(item.CreatedAt))
-                                    .Distinct()
-                                    .ToList();
-                                }
-
-                                @foreach (var uniqueTimeAgo in uniqueTimeAgoValues)
-                                {
-                                    <label class="container">
-                                        @uniqueTimeAgo
-                                        <input type="checkbox" checked="checked active">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                }
-
-                                @functions {
-                                    string GetTimeAgo(DateTime createdAt)
-                                    {
-                                        TimeSpan timeAgo = DateTime.Now - createdAt;
-
-                                        if (timeAgo.TotalHours < 24)
-                                        {
-                                            return "1 days ago";
-                                        }
-                                        else if (timeAgo.TotalDays < 7)
-                                        {
-                                            return "1 weeks ago";
-                                        }
-                                        else if(timeAgo.TotalHours<1)
-                                        {
-                                            return "1 hours ago"; 
-                                        }
-                                        else
-                                        {
-                                            return "1 month ago";
-                                        }
-                                    }
-                                }
-
-                                
-                            </div>
-                            <!-- select-Categories End -->
-                        </div>
-                        <div class="single-listing">
-                            <!-- Range Slider Start -->
-                            <aside class="left_widgets p_filter_widgets price_rangs_aside sidebar_box_shadow">
-                                <div class="small-section-tittle2">
-                                    <h4>Filter Jobs</h4>
-                                </div>
-                                <div class="widgets_inner">
-                                    <div class="range_item">
-                                        <input  class="js-range-slider" value="@Model.RangeValue" />
-                                        <div class="d-flex align-items-center">
-                                            <div class="price_text">
-                                                <p>Price :</p>
-                                            </div>
-                                            <div class="price_value d-flex justify-content-center">
-                                                <input class="js-input-from" id="amount_from" value="@Model.PriceFrom" readonly />
-                                                <span>to</span>
-                                                <input  class="js-input-to" id="amount_to" value="@Model.PriceTo" readonly />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </aside>
-                            <!-- Range Slider End -->
-                        </div>
+                        
                     </div>
                     <!-- jQuery ve jQuery UI ekleyin (eğer eklenmemişse) -->
                     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

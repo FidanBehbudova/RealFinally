@@ -129,9 +129,11 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 		}
 		public async Task<PaginateVM<Job>> GetCategoryId(int id, int page = 1, int take = 10)
 		{
-            if (page < 1 || take < 1) throw new Exception("Bad request");		
-		    ICollection<Job>jobs = await _repository.GetPagination(skip: (page - 1) * take, take: take,orderExpression: x => x.Id,expression:c=>c.CategoryId==id, IsDescending: true,includes:new string[] {"Images","Category","Company.CompanyCities", "Company.CompanyCities.City" }).ToListAsync();
-            if (jobs == null) throw new Exception("Not Found");
+            if (page < 1 || take < 1) throw new Exception("Bad request");
+			//ICollection<Job>jobs = await _repository.GetPagination(skip: (page - 1) * take, take: take,orderExpression: x => x.Id,expression:c=>c.CategoryId==id, IsDescending: true,includes:new string[] {"Images","Category","Company.CompanyCities", "Company.CompanyCities.City" }).ToListAsync();
+			ICollection<Job> jobs = await _repository.GetAllWhere(c=>c.CategoryId==id,includes: new string[] { "Images", "Category", "Company.CompanyCities", "Company.CompanyCities.City" }).ToListAsync();
+
+			if (jobs == null) throw new Exception("Not Found");
             int count = await _repository.GetAll().CountAsync();
             if (count < 0) throw new Exception("Not Found");
             double totalpage = Math.Ceiling((double)count / take);

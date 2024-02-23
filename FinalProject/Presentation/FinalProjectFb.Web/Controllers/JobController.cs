@@ -32,29 +32,14 @@ namespace FinalProjectFb.Web.Controllers
 			return View(vm);
 		}
 
-        //public async Task<IActionResult> AllJob()
-        //{
+    
+       
 
-        //              var result = await _service.AllJobAsync();
-
-        //              if (result != null)
-        //              {
-        //                  return View(result);
-        //              }
-        //              else
-        //              {
-        //                  return NotFound();
-        //              }
-
-
-
-        //      }
-
-        public async Task<IActionResult> AllJob(int? categoryId,int? order,int rangeValue = 50, int priceFrom = 0, int priceTo = 100, int page = 1, int take = 5)
+        public async Task<IActionResult> AllJob(int? cityId,int? categoryId,int? order,int rangeValue = 50, int priceFrom = 0, int priceTo = 100, int page = 1, int take = 5)
         {
             IQueryable<Job> query = _context.Jobs.Include(j => j.Images).Include(j=>j.Category).Include(j=>j.Company).ThenInclude(c=>c.CompanyCities).ThenInclude(cc=>cc.City).AsQueryable();
             IQueryable<Category> querya = _context.Categories.AsQueryable();
-
+			IQueryable<CompanyCity> quaryc= _context.CompanyCities.Include(cc=>cc.City).Include(cc=>cc.Company).AsQueryable();
             switch (order)
             {
                 case 1:
@@ -71,8 +56,24 @@ namespace FinalProjectFb.Web.Controllers
 			{
 				query =  query.Where(c => c.CategoryId == categoryId);
 			}
+			if (cityId != null)
+			{
+				query = query.Where(c => c.Company.CompanyCities.FirstOrDefault(cc=>cc.City.Id==cityId).CityId==cityId);
+			}
+			// AllJob metodu içinde
+			var selectedCities = Request.Query["selectedCities"].ToString(); // Bu satır ile seçilen şehirleri alın
 
-            rangeValue = Math.Clamp(rangeValue, 0, 10000);
+			if (!string.IsNullOrEmpty(selectedCities))
+			{
+				var selectedCityList = selectedCities.Split(',').ToList();
+				query = query.Where(c => c.Company.CompanyCities.Any(cc => selectedCityList.Contains(cc.City.Name)));
+			}
+			// AllJob metodu içinde
+			var uniqueCityNames = await _context.Cities.Select(c => c.Name).Distinct().ToListAsync();
+			ViewBag.UniqueCityNames = uniqueCityNames;
+
+
+			rangeValue = Math.Clamp(rangeValue, 0, 10000);
             priceFrom = Math.Clamp(priceFrom, 0, 10000);
             priceTo = Math.Clamp(priceTo, 0, 10000);
 
@@ -83,7 +84,8 @@ namespace FinalProjectFb.Web.Controllers
                 var model = new AllJobVM
                 {
                     Jobs = await query.ToListAsync(),
-                    //Categories = allJobResult.Categories,
+                  
+					CompanyCities=await quaryc.ToListAsync(),
 					Categories=await querya.ToListAsync(),
                     Companies = allJobResult.Companies,
                     RangeValue = rangeValue,
