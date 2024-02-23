@@ -48,13 +48,13 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 			_category = category;
             _context = context;
         }
-		public async Task<AllJobVM> AllJobAsync()
+		public async Task<AllJobVM> AllJobAsync(int page = 1, int take = 5)
 		{
 			AllJobVM vm = new AllJobVM
 			{
-				Categories = await _category.GetAll(includes: new string[] { "Jobs" }).ToListAsync(),
-				Companies = await _company.GetAll(includes: new string[] { "CompanyCities", "CompanyCities.City" }).ToListAsync(),
-				Jobs=await _repository.GetAll(includes: new string[] {"Images","Category", "Company", "Company.CompanyCities", "Company.CompanyCities.City" }).ToListAsync(),
+				Categories = await _category.GetPagination(skip: (page - 1) * take, take: take, includes: new string[] { "Jobs" }).ToListAsync(),
+				Companies = await _company.GetPagination(skip: (page - 1) * take, take: take, includes: new string[] { "CompanyCities", "CompanyCities.City" }).ToListAsync(),
+				Jobs=await _repository.GetPagination(skip: (page - 1) * take, take: take, includes: new string[] {"Images","Category", "Company", "Company.CompanyCities", "Company.CompanyCities.City" }).ToListAsync(),
 			};
 			return vm;
 
@@ -127,12 +127,10 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 			await _repository.SaveChangesAsync();
 			return true;
 		}
-
 		public async Task<PaginateVM<Job>> GetCategoryId(int id, int page = 1, int take = 10)
 		{
-            if (page < 1 || take < 1) throw new Exception("Bad request");
-			//ICollection<Job> jobs = await _repository.GetAllWhere(c => c.Category).ToListAsync();
-		ICollection<Job>jobs = await _repository.GetPagination(skip: (page - 1) * take, take: take,orderExpression: x => x.Id,expression:c=>c.CategoryId==id, IsDescending: true,includes:new string[] {"Images","Category","Company.CompanyCities", "Company.CompanyCities.City" }).ToListAsync();
+            if (page < 1 || take < 1) throw new Exception("Bad request");		
+		    ICollection<Job>jobs = await _repository.GetPagination(skip: (page - 1) * take, take: take,orderExpression: x => x.Id,expression:c=>c.CategoryId==id, IsDescending: true,includes:new string[] {"Images","Category","Company.CompanyCities", "Company.CompanyCities.City" }).ToListAsync();
             if (jobs == null) throw new Exception("Not Found");
             int count = await _repository.GetAll().CountAsync();
             if (count < 0) throw new Exception("Not Found");

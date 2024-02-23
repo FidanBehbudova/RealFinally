@@ -161,7 +161,21 @@ namespace FinalProjectFb.Persistence.Implementations.Services
             }
         }
 
+        public async Task<PaginateVM<Company>> GetAllAsyncAdmin(int page = 1, int take = 10)
+        {
 
+            ICollection<Company> companies = await _repository.GetPagination(skip: (page - 1) * take, take: take).ToListAsync();
+            int count = await _repository.GetAll().CountAsync();
+            double totalpage = Math.Ceiling((double)count / take);
+            PaginateVM<Company> vm = new PaginateVM<Company>
+            {
+
+                Items = companies,
+                CurrentPage = page,
+                TotalPage = totalpage
+            };
+            return vm;
+        }
         public async Task<PaginateVM<Company>> GetAllAsync(int page = 1, int take = 10)
         {
             
@@ -200,7 +214,7 @@ namespace FinalProjectFb.Persistence.Implementations.Services
 
             };
             if (company is null) throw new NotFoundException("not found");
-
+            //List<Job> jobs=await _repository.GetAllWhere(expression:jobs=>jobs.Id==id,includes: new string[] { nameof(Job.Images) })
             CompanyDetailVM detailVM = new CompanyDetailVM
             {
 

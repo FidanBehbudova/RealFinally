@@ -13,7 +13,7 @@ namespace FinalProjectFb.Application.Abstractions.Services
     {
         Task<PaginateVM<Company>> GetCompaniesCreatedByUserAsync(string userid, int page = 1, int take = 10);
         Task<UpdateCompanyVM> GetCitiesForUpdateFormAsy(UpdateCompanyVM updateCompanyVM);
-
+        Task<PaginateVM<Company>> GetAllAsyncAdmin(int page = 1, int take = 10);
         Task<bool> GetConfirmationFormAsync(ConfirmationFormVM vm,ModelStateDictionary modelstate);
         Task<ConfirmationFormVM> GetCitiesForConfirmationFormAsync(ConfirmationFormVM confirmationFormVM);
         //void ReverseDeleteCompany(int companyId);

@@ -48,16 +48,28 @@
                                 <h4>Job Category</h4>
                             </div>
                             <!-- Select job items start -->
-                            <div class="select-job-items2">
-                                <select name="select">
-                                    <option value="">All Category</option>
-                                    @foreach (var item in Model.Categories)
-                                    {
-                                        <option value="">@item.Name</option>
-                                    }
-                                    
-                                </select>
-                            </div>
+                            <form id="categoryForm" method="get" action="/job/alljob">
+                                <div class="select-job-items2">
+                                    <select asp-items="new SelectList(Model.Categories,nameof(Category.Id),nameof(Category.Name))" name="categoryId" onchange="this.parentElement.parentElement.submit()">
+                                        <option value="">All Category</option>
+                                        @* @foreach (var item in Model.Categories)
+                                        {
+                                            <option value="@item.Id" action="alljob">@item.Name</option>
+                                        } *@
+                                    </select>
+                                </div>
+                            </form>
+
+                            <script>
+                                function submitForm() {
+                                    document.getElementById("categoryForm").submit();
+                                }
+                            </script>
+
+
+                  
+                          
+
                             <!--  Select job items End-->
                             <!-- select-Categories start -->
                       

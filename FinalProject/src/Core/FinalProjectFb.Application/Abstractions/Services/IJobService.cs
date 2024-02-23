@@ -13,7 +13,7 @@ namespace FinalProjectFb.Application.Abstractions.Services
 {
     public interface IJobService
     {
-        Task<AllJobVM> AllJobAsync();
+        Task<AllJobVM> AllJobAsync(int page = 1, int take = 5);
         //Task<CreateJobVM> CreatedAsyc(CreateJobVM vm);
         //Task<bool> CreateAsync(CreateJobVM createJobVM, ModelStateDictionary ms);
         Task<bool> UpdateAsync(UpdateJobVM JobVm, ModelStateDictionary modelState, int id);

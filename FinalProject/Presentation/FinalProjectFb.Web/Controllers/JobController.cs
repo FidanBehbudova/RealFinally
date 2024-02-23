@@ -50,9 +50,10 @@ namespace FinalProjectFb.Web.Controllers
 
         //      }
 
-        public async Task<IActionResult> AllJob(int? order,int rangeValue = 50, int priceFrom = 0, int priceTo = 100)
+        public async Task<IActionResult> AllJob(int? categoryId,int? order,int rangeValue = 50, int priceFrom = 0, int priceTo = 100, int page = 1, int take = 5)
         {
             IQueryable<Job> query = _context.Jobs.Include(j => j.Images).Include(j=>j.Category).Include(j=>j.Company).ThenInclude(c=>c.CompanyCities).ThenInclude(cc=>cc.City).AsQueryable();
+            IQueryable<Category> querya = _context.Categories.AsQueryable();
 
             switch (order)
             {
@@ -60,26 +61,30 @@ namespace FinalProjectFb.Web.Controllers
                     query = query.OrderBy(j => j.Name);
                     break;
                 case 2:
-                    query = query.OrderBy(j => j.Salary);
+                    query = query.OrderByDescending(j => j.Salary);
                     break;
                 case 3:
                     query = query.OrderByDescending(j => j.Id);
                     break;
             }
-
+			if (categoryId!=null)
+			{
+				query =  query.Where(c => c.CategoryId == categoryId);
+			}
 
             rangeValue = Math.Clamp(rangeValue, 0, 10000);
             priceFrom = Math.Clamp(priceFrom, 0, 10000);
             priceTo = Math.Clamp(priceTo, 0, 10000);
 
-            var allJobResult = await _service.AllJobAsync();
+            var allJobResult = await _service.AllJobAsync(page,take);
 
             if (allJobResult != null)
             {
                 var model = new AllJobVM
                 {
                     Jobs = await query.ToListAsync(),
-                    Categories = allJobResult.Categories,
+                    //Categories = allJobResult.Categories,
+					Categories=await querya.ToListAsync(),
                     Companies = allJobResult.Companies,
                     RangeValue = rangeValue,
                     PriceFrom = priceFrom,

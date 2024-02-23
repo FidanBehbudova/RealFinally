@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FinalProjectFb.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace FinalProjectFb.Application.ViewModels
     public class CompanyDetailVM
     {
         public CompanyItemVM Company { get; set; }
+        public List<Job> Jobs { get; set; }
 
-    
     }
 }
